@@ -1,6 +1,32 @@
-@PostCtrl = ($scope, $routeParams) ->
+@PostCtrl = ($scope, $routeParams, $location, $q, postData) ->
 
   $scope.data =
-    post: {title: 'My first post', contents: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec laoreet lobortis vulputate. Ut tempus, orci eu tempor sagittis, mauris orci ultrices arcu, in volutpat elit elit semper turpis. Maecenas id lorem quis magna lacinia tincidunt. In libero magna, pharetra in hendrerit vitae, luctus ac sem. Nulla velit augue, vestibulum a egestas et, imperdiet a lacus. Nam mi est, vulputate eu sollicitudin sed, convallis vel turpis. Cras interdum egestas turpis, ut vestibulum est placerat a. Proin quam tellus, cursus et aliquet ut, adipiscing id lacus. Aenean iaculis nulla justo.'}
+    postData: postData.data
+    currentPost:
+      title: 'Loading...'
+      contents: ''
 
   $scope.data.postId = $routeParams.postId
+
+  $scope.navNewPost = ->
+    $location.url('/post/new')
+
+  $scope.navHome = ->
+    $location.url('/')
+
+  # This will be run once the loadPosts successfully completes (or immediately
+  # if data is already loaded)
+  $scope.prepPostData = ->
+    post = _.findWhere(postData.data.posts, { id: parseInt($scope.data.postId) })
+    $scope.data.currentPost.title = post.title
+    $scope.data.currentPost.contents = post.contents
+
+  # Create promise to be resolved after posts load
+  @deferred = $q.defer()
+  @deferred.promise.then($scope.prepPostData)
+
+  # Provide deferred promise chain to the loadPosts function
+  postData.loadPosts(@deferred)
+
+
+@PostCtrl.$inject = ['$scope', '$routeParams', '$location', '$q', 'postData']
