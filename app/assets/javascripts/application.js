@@ -15,3 +15,4 @@
 //= require bootstrap
 //= require underscore
 //= require angular-1.2.6/angular
+//= require angular-1.2.6/angular-route
